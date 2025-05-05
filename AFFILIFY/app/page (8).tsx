@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 // Placeholder data for reviews - replace with actual data later
 const reviews = [
-  { id: 1, name: 'John D.', text: 'AFFILIFY helped me launch my first profitable site in days!' },
+  { id: 1, name: 'John D.', text: 'AFFILIFY helped me launch my first profitable site in minutes!' },
   { id: 2, name: 'Sarah K.', text: 'The AI tools are incredibly powerful and easy to use.' },
   { id: 3, name: 'Mike P.', text: 'Finally making real money with affiliate marketing, thanks to this platform.' },
   { id: 4, name: 'Lisa M.', text: 'Generated more leads than ever before!' },
