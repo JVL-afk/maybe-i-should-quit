@@ -1,35 +1,42 @@
-// In-memory store for demo purposes. Replace with a database in production.
-let users = {};
+"use server";
 
-// Basic password hashing simulation (replace with bcrypt in production)
-const simpleHash = (password) => {
-  return `hashed_${password}`;
-};
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: Request) {
+// In-memory store for users (for demonstration purposes only - use a database in production)
+const users: any[] = [];
+
+export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await request.json();
+    const { email, password, name } = await req.json();
 
-    if (!email || !password) {
-      return new Response(JSON.stringify({ message: 'Email and password are required' }), { status: 400 });
+    if (!email || !password || !name) {
+      return NextResponse.json({ message: 'Missing email, name, or password' }, { status: 400 });
     }
 
-    if (users[email]) {
-      return new Response(JSON.stringify({ message: 'User already exists' }), { status: 409 }); // Conflict
+    // Check if user already exists
+    if (users.find(user => user.email === email)) {
+      return NextResponse.json({ message: 'User already exists' }, { status: 409 });
     }
 
-    // Store the new user (with simulated hashed password)
-    users[email] = { passwordHash: simpleHash(password) };
+    // Create new user (in a real app, hash the password)
+    const newUser = { id: Date.now().toString(), email, password, name, plan: 'free' }; // Default to free plan
+    users.push(newUser);
 
-    console.log('User signed up:', email);
-    console.log('Current users:', users); // Log users for debugging
+    // Placeholder for sending confirmation email
+    console.log(`Placeholder: Sending confirmation email to ${email}`);
+    // In a real app, you would integrate an email service here (e.g., SendGrid, Mailgun)
+    // await sendConfirmationEmail(email, verificationToken);
 
-    // In a real app, you might generate a session token here
-    return new Response(JSON.stringify({ message: 'Signup successful' }), { status: 201 }); // Created
+    // Respond with success and a message to check email (even though it's a placeholder)
+    // The actual redirect to login/dashboard will be handled by the frontend after this response.
+    return NextResponse.json({ 
+      message: 'Signup successful! Please check your email for a confirmation link (placeholder). You will be redirected to login.', 
+      user: { email: newUser.email, name: newUser.name } 
+    }, { status: 201 });
 
   } catch (error) {
     console.error('Signup error:', error);
-    return new Response(JSON.stringify({ message: 'Internal server error' }), { status: 500 });
+    return NextResponse.json({ message: 'Internal server error during signup' }, { status: 500 });
   }
 }
 
