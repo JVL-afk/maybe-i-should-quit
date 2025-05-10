@@ -1,36 +1,41 @@
+"use client";
 
-'use client'
-
-import { useState } from 'react'
-import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import React, { useState, FormEvent, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Check for signup success message from query params
-  useState(() => {
-    if (searchParams.get('signup') === 'success') {
-      setSuccessMessage('Account created successfully! Please log in.');
-      // Optionally clear the query param
-      // router.replace('/login', undefined); // Use replace to avoid adding to history
+  useEffect(() => {
+    const message = searchParams.get('message');
+    if (message) {
+      setSuccessMessage(decodeURIComponent(message));
     }
-  }, [searchParams, router]);
+    // Clear the message from URL to prevent it from showing again on refresh/navigation
+    // router.replace('/login', undefined); // This might cause issues if not handled carefully with Next.js 13+ app router
+  }, [searchParams]);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError('')
-    setSuccessMessage('') // Clear success message on new attempt
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMessage(''); // Clear previous success message on new attempt
+    setIsLoading(true);
+
+    if (!email || !password) {
+      setError('Email and password are required.');
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,73 +43,67 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+      if (res.ok && data.redirectTo) {
+        // In a real app, you might store a session token here (e.g., in context or secure storage)
+        setSuccessMessage(data.message || 'Login successful! Redirecting...');
+        router.push(data.redirectTo); // Redirect to dashboard
+      } else {
+        setError(data.message || 'An error occurred during login.');
       }
-
-      // Login successful
-      console.log('Login successful for:', email);
-      // In a real app, you would store a session token here (e.g., in localStorage or cookies)
-      // For now, just redirect to dashboard
-      router.push('/dashboard'); // Redirect to dashboard
-
-    } catch (err: any) {
-      setError(err.message || 'Login failed. Please try again.')
-      console.error(err)
-    } finally {
-      setIsLoading(false)
+    } catch (err) {
+      console.error('Login fetch error:', err);
+      setError('Failed to connect to the server. Please try again.');
     }
-  }
+    setIsLoading(false);
+  };
 
   return (
-    <main className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-[rgba(45,26,61,0.7)] p-10 rounded-lg shadow-xl">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-[var(--text-secondary)]">
-            Or{' '}
-            <Link href="/signup" className="font-medium text-[var(--button-primary)] hover:text-[var(--button-primary-hover)]">
-              create a new account
-            </Link>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-orange-600 p-4">
+      <div className="max-w-md w-full bg-gray-800 shadow-xl rounded-lg p-8 space-y-6">
+        <div className="text-center">
+          <h2 className="mt-6 text-3xl font-extrabold text-white">Sign in to AFFILIFY</h2>
+          <p className="mt-2 text-sm text-gray-400">
+            Access your dashboard and tools.
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          {error && (
-            <div className="bg-red-500/20 border border-red-500 text-red-300 px-4 py-3 rounded-md">
-              {error}
-            </div>
-          )}
-          {successMessage && (
-            <div className="bg-green-500/20 border border-green-500 text-green-300 px-4 py-3 rounded-md">
-              {successMessage}
-            </div>
-          )}
-          <input type="hidden" name="remember" defaultValue="true" />
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
-              </label>
+
+        {successMessage && (
+          <div className="bg-green-700 border border-green-600 text-green-100 px-4 py-3 rounded-md relative mb-4" role="alert">
+            <span className="block sm:inline">{successMessage}</span>
+          </div>
+        )}
+        {error && (
+          <div className="bg-red-700 border border-red-600 text-red-100 px-4 py-3 rounded-md relative mb-4" role="alert">
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
+
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+              Email address
+            </label>
+            <div className="mt-1">
               <input
-                id="email-address"
+                id="email"
                 name="email"
                 type="email"
                 autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[rgba(255,255,255,0.1)] bg-[rgba(0,0,0,0.2)] placeholder-[var(--text-secondary)] focus:outline-none focus:ring-[var(--button-primary)] focus:border-[var(--button-primary)] focus:z-10 sm:text-sm rounded-t-md"
-                placeholder="Email address"
+                className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm bg-gray-700 text-white"
               />
             </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+              Password
+            </label>
+            <div className="mt-1">
               <input
                 id="password"
                 name="password"
@@ -113,19 +112,16 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-[rgba(255,255,255,0.1)] bg-[rgba(0,0,0,0.2)] placeholder-[var(--text-secondary)] focus:outline-none focus:ring-[var(--button-primary)] focus:border-[var(--button-primary)] focus:z-10 sm:text-sm rounded-b-md"
-                placeholder="Password"
+                className="appearance-none block w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm bg-gray-700 text-white"
               />
             </div>
           </div>
 
           <div className="flex items-center justify-between">
-            {/* Removed Remember me checkbox */}
             <div className="text-sm">
-              {/* Add password reset link if needed */}
-              {/* <a href="#" className="font-medium text-[var(--button-primary)] hover:text-[var(--button-primary-hover)]">
+              <Link href="/forgot-password" className="font-medium text-orange-400 hover:text-orange-300">
                 Forgot your password?
-              </a> */}
+              </Link>
             </div>
           </div>
 
@@ -133,21 +129,25 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[var(--button-primary)] hover:bg-[var(--button-primary-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--button-primary)] transition duration-300 disabled:opacity-50"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-orange-500 disabled:opacity-50"
             >
-              {isLoading ? (
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              ) : (
-                'Sign in'
-              )}
+              {isLoading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
         </form>
+
+        <div className="text-sm text-center">
+          <Link href="/signup" className="font-medium text-orange-400 hover:text-orange-300">
+            Don&apos;t have an account? Sign up
+          </Link>
+        </div>
+         <div className="text-sm text-center mt-4">
+          <Link href="/" className="font-medium text-gray-400 hover:text-gray-300">
+            &larr; Back to Homepage
+          </Link>
+        </div>
       </div>
-    </main>
-  )
+    </div>
+  );
 }
 
