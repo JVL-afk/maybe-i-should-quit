@@ -26,12 +26,11 @@ export default function HomePage() {
         {/* Text Overlay */}
         <div className="absolute inset-x-0 top-0 pt-8 sm:pt-12 md:pt-16 flex justify-center z-10">
           <h1 className="text-white text-2xl sm:text-3xl md:text-4xl font-bold text-center px-4 bg-black bg-opacity-30 rounded py-2">
-            Want your charts to look like this?
+            Want your income to look like this?
           </h1>
         </div>
       </div>
 
-      {/* Content below the scrollable image */}
       <div className="w-full max-w-5xl px-4 py-16 sm:px-6 lg:px-8 text-center">
         
         {/* 2. Welcome Text Section */}
