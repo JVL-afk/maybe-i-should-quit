@@ -17,7 +17,7 @@ const features = [
   },
   {
     title: 'AI Website Generation',
-    description: 'Automatically create fully functional, SEO-optimized affiliate websites in minutes. Based on your analysis or a source URL, AFFILIFY builds sites with integrated content and affiliate links.',
+    description: 'Automatically create fully functional, SEO-optimized affiliate websites in minutes. These sites will not only rank on Google, but they will also have protection against automated site detectors. Based on your analysis or a source URL, AFFILIFY builds sites with integrated content and affiliate links.',
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-4 text-[var(--button-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
@@ -52,16 +52,6 @@ const features = [
       </svg>
     ),
   },
-  {
-    title: 'Developer API',
-    description: 'Integrate AFFILIFY\'s core analysis and generation capabilities into your own tools and workflows with our robust API (coming soon).',
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-4 text-[var(--button-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586" />
-      </svg>
-    ),
-  },
-]
 
 export default function FeaturesPage() {
   return (
