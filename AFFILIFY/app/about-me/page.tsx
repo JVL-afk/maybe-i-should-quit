@@ -20,7 +20,7 @@ export default function AboutMePage() {
             {/* Placeholder content that the user can fill in later */}
             <div className="space-y-6">
               <p className="text-lg">
-                [Your introduction goes here. Share your story, background, and what led you to create AFFILIFY.]
+                [HI, I'm Andrew and I'm with nothing better than you. I'm from a small village in Romania and I am a student at the local school. About one year ago, I reached my peak: I had great friends, high grades, and I was seeing my crush on the side. Everything was going as planned. But then, in December 2024,something hit me. I realized that I don't just want to be that normal guy, I wanted something different. That one thought changed everything, my crush became just another girl and my friends became some annoying people. I knew I had to do something. Back then, I didn't know anything about how to make money online, but I knew that was the best way. I tried dropshipping and it failed, I tried Copywriting and it failed, I tried  ]
               </p>
               
               <div className="my-8">
